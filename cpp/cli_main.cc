@@ -86,8 +86,6 @@ std::vector<std::string> GetLibSuffixes() {
 #endif
 }
 
-
-
 std::vector<std::string> CountUTF8(const std::string& s) {
   // assume that the string is always valid utf8
   std::vector<std::string> ret;
@@ -133,6 +131,8 @@ void Chat(tvm::runtime::Module chat_mod, const std::string& model, int64_t max_g
     conv_template = "dolly";
   } else if (model.find("stablelm") == 0) {
     conv_template = "stablelm";
+  } else if (model.find("moss") == 0) {
+    conv_template = "moss";
   } else {
     LOG(FATAL) << "Do not recognize model name " << model;
   }
@@ -151,7 +151,7 @@ void Chat(tvm::runtime::Module chat_mod, const std::string& model, int64_t max_g
     std::string inp;
     std::cout << role0 << ": " << std::flush;
     std::getline(std::cin, inp);
-    if(!std::cin.good()) break;
+    if (!std::cin.good()) break;
     if (inp.substr(0, 6) == "/reset") {
       // initialize chat context
       chat_mod.GetFunction("reset_chat")();
@@ -163,7 +163,7 @@ void Chat(tvm::runtime::Module chat_mod, const std::string& model, int64_t max_g
 
     std::string prev_printed = "";
     auto printed_UTF8_chars = CountUTF8(prev_printed);
-    
+
     std::cout << role1 << ": " << std::flush;
     f_encode(inp);
     for (size_t i = 0; !f_stop(); ++i) {
